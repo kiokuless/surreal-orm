@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"go/ast"
 	"os"
@@ -60,6 +61,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 			defer file.Close()
 			file.Write([]byte(generatedCode))
+			fmt.Println("generated: " + newFilename)
 		}
 	})
 
@@ -95,18 +97,29 @@ func generateStructByFields(packageName, structName string, fields []*ast.Field)
 		block...,
 	)
 
+	f.Type().Id("objectJSON").Struct(Id("Inner").Id(decapitalizedStructName + "JSON").Tag(map[string]string{"json": "Object"}))
+
 	return fmt.Sprintf("%#v", f)
 }
 
 func main() {
-	// jsonBytes := []byte(`{"requested_at":{"Strand":"2019-01-01T00:00:00Z"},"responded_at":{"Strand":"2019-01-01T00:00:00Z"}}`)
-	// var r recordJSON
-	// err := json.Unmarshal(jsonBytes, &r)
-	// if err != nil {
-	// 	panic(err)
-	// }
+	jsonBytes := []byte(`{
+		"Object": {
+			"requested_at": {
+				"Strand": "2024-01-19T16:29:08.182623+09:00"
+			},
+			"responded_at": {
+				"Strand": "2024-01-19T16:29:08.331045+09:00"
+			}
+		}
+	}`)
+	var r objectJSON
+	err := json.Unmarshal(jsonBytes, &r)
+	if err != nil {
+		panic(err)
+	}
 
-	// record := fromrecordJSON(r)
-	// fmt.Printf("%#v\n", record)
+	record := fromrecordJSON(r.Inner)
+	fmt.Printf("%#v\n", record)
 	singlechecker.Main(surrealTagAnalyzer)
 }
