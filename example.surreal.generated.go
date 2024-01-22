@@ -19,3 +19,6 @@ func fromrecordJSON(j recordJSON) Record {
 type objectJSON struct {
 	Inner recordJSON `json:"Object"`
 }
+type arrayJSON struct {
+	Inner []objectJSON `json:"Array"`
+}

@@ -98,28 +98,59 @@ func generateStructByFields(packageName, structName string, fields []*ast.Field)
 	)
 
 	f.Type().Id("objectJSON").Struct(Id("Inner").Id(decapitalizedStructName + "JSON").Tag(map[string]string{"json": "Object"}))
+	f.Type().Id("arrayJSON").Struct(Id("Inner").Index().Id("objectJSON").Tag(map[string]string{"json": "Array"}))
 
 	return fmt.Sprintf("%#v", f)
 }
 
 func main() {
 	jsonBytes := []byte(`{
-		"Object": {
-			"requested_at": {
-				"Strand": "2024-01-19T16:29:08.182623+09:00"
+		"Array": [
+			{
+				"Object": {
+					"id": {
+						"Thing": {
+							"id": {
+								"String": "41hkwf1qnr4925w2iqg4"
+							},
+							"tb": "record"
+						}
+					},
+					"requested_at": {
+						"Strand": "2024-01-19T16:29:08.182623+09:00"
+					},
+					"responded_at": {
+						"Strand": "2024-01-19T16:29:08.331045+09:00"
+					}
+				}
 			},
-			"responded_at": {
-				"Strand": "2024-01-19T16:29:08.331045+09:00"
+			{
+				"Object": {
+					"id": {
+						"Thing": {
+							"id": {
+								"String": "r71ens016m8hzf347c90"
+							},
+							"tb": "record"
+						}
+					},
+					"requested_at": {
+						"Strand": "2024-01-22T14:06:13.769096+09:00"
+					},
+					"responded_at": {
+						"Strand": "2024-01-22T14:06:14.763851+09:00"
+					}
+				}
 			}
-		}
+		]
 	}`)
-	var r objectJSON
+	var r arrayJSON
 	err := json.Unmarshal(jsonBytes, &r)
 	if err != nil {
 		panic(err)
 	}
 
-	record := fromrecordJSON(r.Inner)
+	record := fromrecordJSON(r.Inner[1].Inner)
 	fmt.Printf("%#v\n", record)
 	singlechecker.Main(surrealTagAnalyzer)
 }
