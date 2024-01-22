@@ -15,3 +15,7 @@ func fromrecordJSON(j recordJSON) Record {
 	s.RespondedAt = j.RespondedAt.Strand
 	return s
 }
+
+type objectJSON struct {
+	inner recordJSON `json:"Object"`
+}
